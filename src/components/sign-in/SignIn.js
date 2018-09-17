@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -24,7 +24,6 @@ const styles = theme => ({
     },
   },
   paper: {
-    marginTop: theme.spacing.unit * 8,
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -43,10 +42,22 @@ const styles = theme => ({
   },
 });
 
-function SignIn(props) {
-  const { classes } = props;
+class SignIn extends Component<Props> {
+  state = {
+    email: '',
+    password: '',
+    error: ' '
+  }
 
-  async function signUp(){
+  handleEmailChange = (email) => {
+    this.setState({email: email.target.value});
+  }
+
+  handlePasswordChange = (password) => {
+    this.setState({password: password.target.value});
+  }
+
+  async signUp(){
     const settings = {
       method: 'POST',
       headers: {
@@ -54,63 +65,67 @@ function SignIn(props) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        'email': 'lucassena.rj@gmail.com',
-        'password': '123456'
+        'email': this.state.email,
+        'password': this.state.password
       })
     };
 
-    const url = 'https://my-social-network-api.herokuapp.com/login';
+    //const url = 'https://my-social-network-api.herokuapp.com/login';
+    const url = 'http://127.0.0.1:3333/login';
 
     try {
       const response = await fetch(url, settings);
       let data = await response.json();
 
       if (data) {
-        console.log('login');
+        alert('ae mizeravis!');
       }
 
-    } catch (error) {
-      console.log(error);
+    } catch (err) {
+      this.setState({error: 'Erro while try to login.'}, () => false);
     }
   }
 
-  return (
-    <React.Fragment>
-      <CssBaseline />
-      <main className={classes.layout}>
-        <Paper className={classes.paper}>
-          <Avatar className={classes.avatar}>
-            <LockIcon />
-          </Avatar>
-          <Typography variant="headline">Sign in</Typography>
-          <form className={classes.form}>
-            <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="email">Email Address</InputLabel>
-              <Input id="email" name="email" autoComplete="email" autoFocus />
-            </FormControl>
-            <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="password">Password</InputLabel>
-              <Input
-                name="password"
-                type="password"
-                id="password"
-                autoComplete="current-password"
-              />
-            </FormControl>
-            <Button
-              onClick={() => signUp()}
-              fullWidth
-              variant="raised"
-              color="primary"
-              className={classes.submit}
-            >
-              Sign in
-            </Button>
-          </form>
-        </Paper>
-      </main>
-    </React.Fragment>
-  );
+  render() {
+    return (
+      <Fragment>
+        <CssBaseline />
+        <main className={styles.layout}>
+          <Paper className={styles.paper}>
+            <Avatar className={styles.avatar}>
+              <LockIcon />
+            </Avatar>
+            <Typography variant="headline">Sign in</Typography>
+            <form className={styles.form}>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="email">Email Address</InputLabel>
+                <Input id="email" name="email" autoComplete="email" autoFocus onChange={this.handleEmailChange} />
+              </FormControl>
+              <FormControl margin="normal" required fullWidth>
+                <InputLabel htmlFor="password"  onChange={this.handlePasswordChange}>Password</InputLabel>
+                <Input
+                  name="password"
+                  type="password"
+                  id="password"
+                  autoComplete="current-password"
+                />
+              </FormControl>
+              {this.state.error.length !== 0 && <p>{this.state.error}</p>}
+              <Button
+                onClick={() => this.signUp()}
+                fullWidth
+                variant="raised"
+                color="primary"
+                className={styles.submit}
+              >
+                Sign in
+              </Button>
+            </form>
+          </Paper>
+        </main>
+      </Fragment>
+    )
+  }
 }
 
 SignIn.propTypes = {
